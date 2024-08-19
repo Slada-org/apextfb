@@ -568,6 +568,100 @@ async function saveOrUpdatePin() {
     }
 }
 
+async function updateUserName() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the new name entered by the user
+    const nameInput = document.querySelector('input[name="newName"]');
+    const newName = nameInput.value.trim();
+
+    if (!newName) {
+        alert('Please enter a new name.');
+        return;
+    }
+
+    // Reference to the user's data in Firebase
+    const userRef = ref(database, 'users/' + accountNumber.accountNumber);
+
+    try {
+        // Update the user's name in Firebase
+        await update(userRef, {
+            firstName: newName
+        });
+        alert('Name updated successfully!');
+        // Optionally clear the name input field
+        nameInput.value = '';
+    } catch (error) {
+        console.error('Error updating name:', error);
+        alert('Error updating name.');
+    }
+}
+
+async function saveImage() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token);
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the file input element
+    const fileInput = document.querySelector('input[name="image-upload"]');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('Please select an image to upload.');
+        return;
+    }
+
+    // Create a storage reference
+    const storageRef = ref(storage, 'user-images/' + accountNumber.accountNumber + '/' + file.name);
+
+    try {
+        // Upload the file to Firebase Storage
+        await uploadBytes(storageRef, file);
+
+        // Get the download URL
+        const downloadURL = await getDownloadURL(storageRef);
+
+        // Save the image URL to Firebase Realtime Database
+        const userRef = ref(database, 'users/' + accountNumber.accountNumber);
+        await update(userRef, {
+            profileImage: downloadURL
+        });
+
+        alert('Image uploaded and URL saved successfully!');
+        // Optionally clear the file input field
+        fileInput.value = '';
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Error uploading image.');
+    }
+}
+
 
 
 // Expose the login function to the global scope
@@ -587,4 +681,6 @@ window.validatePin = validatePin;
 
 window.saveOrUpdatePin = saveOrUpdatePin;
 
-console.log('Closing the cookie');
+window.updateUserName = updateUserName;
+
+// console.log('Closing the cookie');
