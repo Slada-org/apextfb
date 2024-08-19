@@ -1,6 +1,7 @@
 // Import Firebase App (the core Firebase SDK) and Firebase Database
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, update, set, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getStorage, ref as stoRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Get a reference to the database
+const storage = getStorage(app);
 const database = getDatabase(app);
 
 // Function to generate a unique account number
@@ -230,14 +232,17 @@ async function login() {
 
     // Reference to the user's data in the database
     const dbRef = ref(getDatabase());
+    console.log(dbRef);
 
-    try {
-        // Retrieve user data from Firebase
-        const snapshot = await get(child(dbRef, `users/${accountNumber}`));
+    console.log(accountNumber);
+
+    const snapshot = await get(child(dbRef, `users/${accountNumber}`));
+        console.log(snapshot);
         if (snapshot.exists()) {
             const userData = snapshot.val();
             console.log(userData);
             if (userData.password === password) {
+                console.log('Generating 2FA Code');
                 // Generate 2FA code
                 const twoFACode = generate2FACode();
 
@@ -256,9 +261,6 @@ async function login() {
         } else {
             alert('Account number not found.');
         }
-    } catch (error) {
-        console.error('Error during login:', error);
-    }
 }
 
 // Function to verify 2FA code
@@ -324,6 +326,12 @@ async function getUserDetails() {
             const nokName = document.querySelector('input[name="name"]');
             const nokEmail = document.querySelector('input[name="email"]');
             const nokPhone = document.querySelector('input[name="phone"]');
+            const profileImages = document.querySelectorAll('.user-image');
+
+            // Update the src attribute for each image
+            profileImages.forEach(img => {
+                img.src = userData.profileImage;
+            });
 
 
             // Check if the element exists
@@ -375,7 +383,8 @@ async function getUserDetails() {
                 '.nok-name': userData.nextOfKin.name,
                 '.nok-phone': userData.nextOfKin.phone,
                 '.nok-email': userData.nextOfKin.email,
-                '.nok-address': userData.nextOfKin.address
+                '.nok-address': userData.nextOfKin.address,
+                '.drop-name': userData.firstName,
             };
 
             // Update the HTML with user data
@@ -638,7 +647,7 @@ async function saveImage() {
     }
 
     // Create a storage reference
-    const storageRef = ref(storage, 'user-images/' + accountNumber.accountNumber + '/' + file.name);
+    const storageRef = stoRef(storage, 'user-images/' + accountNumber.accountNumber + '/' + file.name);
 
     try {
         // Upload the file to Firebase Storage
@@ -682,5 +691,7 @@ window.validatePin = validatePin;
 window.saveOrUpdatePin = saveOrUpdatePin;
 
 window.updateUserName = updateUserName;
+
+window.saveImage = saveImage;
 
 // console.log('Closing the cookie');

@@ -11,6 +11,11 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <!-- <link rel="stylesheet" href="icon.css"> -->
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
   
   <!-- Ionicons 
   <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css"> -->
@@ -278,40 +283,29 @@ body {
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="images/ALEX%20DAVIDSON%20BONILLA.jpg" class="user-image">
-
-              <!-- <span class="hidden-xs"></span> -->
-             
+              <img src="" class="user-image" alt="User Image">
               <i class="fa fa-circle blink" style="color: #883C0452;"></i> &nbsp;
-             Online
+              Online
             </a>
-
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="images/ALEX%20DAVIDSON%20BONILLA.jpg" class="img-circle">
-
-                <p>
-                  Loading... 
-                  <small>3011 Lakimau St, Honolulu, HI 96817</small>
-                  <small>Hawaii, United States</small>
+                <img src="" class="user-image" alt="User Image">
+                <p class="drop-name">
+                  Loading...
+                  <!-- <small>3011 Lakimau St, Honolulu, HI 96817</small>
+                  <small>Hawaii, United States</small> -->
                 </p>
               </li>
-              <!-- Menu Body -->
-
-
-             
               <!-- Menu Footer-->
               <li class="user-footer">
-                
                 <div class="pull-right">
-                  <a href="logout.php" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="/" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
-            
           </li>
-
+          
 
           <!-- Control Sidebar Toggle Button -->
           <!-- <li>
@@ -329,7 +323,7 @@ body {
       <div class="user-panel">
         <div class="pull-center image">
          <center> 
-            <img src="images/ALEX%20DAVIDSON%20BONILLA.jpg" class="2img-circle" alt="Loading..." width="120px" height="150px" style="border-radius: 5px;"><br>
+            <img id="profileImage" src="" class="user-image" alt="Loading..." width="120px" height="150px" style="border-radius: 5px;"><br>
             
             <div style="color: white; font-family: Segoe UI,Tahoma,Verdana,Arial,sans-serif;"> &gt;&gt; <i class="fa fa-circle text-success blink" style="color: #36F026; "></i>&nbsp; Online &lt;&lt; </div>
            
@@ -576,7 +570,7 @@ body {
                       </form>
                       <!-- /.box-body -->
         
-                  </div>
+                </div>
 
       <div class="row">
 
@@ -610,7 +604,7 @@ body {
           
 
 
-              <div class="col-md-6"> 
+        <div class="col-md-6"> 
 
           <div class="box box-success">
             <div class="box-header with-border">
@@ -638,6 +632,29 @@ body {
 
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-md-6"> 
+  
+            <div class="box box-info">
+              <div class="box-header with-border">
+                <h3 class="box-title">CHANGE Picture FORM</h3>
+              </div>
+              <form role="form" action="" method="POST">
+                <div class="box-body">
+                   <div class="form-group">
+                    <!-- <label for="exampleInputEmail1">New Name</label> -->
+                    <input type="file" class="form-control" name="image-upload" required="">
+                  </div>
+               
+  
+                   <button type="submit" class="btn btn-primary" name="em" onclick="event.preventDefault(); saveImage()">Change Picture!</button>
+  
+                </div>
+                </form>
+                <!-- /.box-body -->
+  
+          </div>
 
 </div>
 
