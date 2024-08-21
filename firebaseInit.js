@@ -672,6 +672,105 @@ async function saveImage() {
 }
 
 
+async function updateOrAddAddress() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the new address entered by the user
+    const addressInput = document.querySelector('input[name="newAddress"]');
+    const newAddress = addressInput.value.trim();
+
+    if (!newAddress) {
+        alert('Please enter a new address.');
+        return;
+    }
+
+    // Reference to the user's data in Firebase
+    const userRef = ref(database, 'users/' + accountNumber.accountNumber);
+
+    try {
+        // Fetch the current user's data
+        const snapshot = await get(userRef);
+        const userData = snapshot.val();
+
+        // Update or add the address
+        await update(userRef, {
+            address: newAddress
+        });
+
+        alert('Address updated successfully!');
+        // Optionally clear the address input field
+        addressInput.value = '';
+    } catch (error) {
+        console.error('Error updating address:', error);
+        alert('Error updating address.');
+    }
+}
+
+
+async function updateOrAddDOB() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the new date of birth entered by the user
+    const dobInput = document.querySelector('input[name="newDOB"]');
+    const newDOB = dobInput.value.trim();
+
+    if (!newDOB) {
+        alert('Please enter your date of birth.');
+        return;
+    }
+
+    // Reference to the user's data in Firebase
+    const userRef = ref(database, 'users/' + accountNumber.accountNumber);
+
+    try {
+        // Fetch the current user's data
+        const snapshot = await get(userRef);
+        const userData = snapshot.val();
+
+        // Update or add the DOB
+        await update(userRef, {
+            dateOfBirth: newDOB
+        });
+
+        alert('Date of Birth updated successfully!');
+        // Optionally clear the DOB input field
+        dobInput.value = '';
+    } catch (error) {
+        console.error('Error updating Date of Birth:', error);
+        alert('Error updating Date of Birth.');
+    }
+}
+
+
+
 
 // Expose the login function to the global scope
 window.login = login;
@@ -693,5 +792,9 @@ window.saveOrUpdatePin = saveOrUpdatePin;
 window.updateUserName = updateUserName;
 
 window.saveImage = saveImage;
+
+window.updateOrAddAddress = updateOrAddAddress;
+
+window.updateOrAddDOB = updateOrAddDOB;
 
 // console.log('Closing the cookie');
