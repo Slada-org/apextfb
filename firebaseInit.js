@@ -502,31 +502,34 @@ async function validatePin() {
         // Retrieve PIN from Firebase
         const snapshot = await get(pinRef);
         if (snapshot.exists()) {
-            const storedEncodedPin = snapshot.val();
+            const storedPin = snapshot.val();
             const enteredPin = document.querySelector('input[name="pin"]').value; // User-entered PIN
             
             // Decode the stored PIN
-            const storedPin = decodeToken(storedEncodedPin);
+            // const storedPin = await decodeToken(storedEncodedPin);
             
             // Validate the PIN
             if (storedPin === enteredPin) {
                 // Logic to process payment
-                alert('Your Payment is being processing');
+                // alert('Your Payment is being processing');
+                return true;
                 // Additional actions on successful validation
             } else {
                 alert('Invalid PIN. Please try again.');
                 // Clear the PIN input field
                 document.querySelector('input[name="pin"]').value = '';
+                return false;
             }
         } else {
             // PIN not found in database
             alert('PIN not found. Please set your PIN.');
             window.location.href = 'change-pin.html'; // Redirect to set PIN page
+            return false;
         }
     } catch (error) {
         console.error('Error during PIN validation:', error);
         alert('Error retrieving PIN details.');
-        window.location.href = 'login.html';
+        // window.location.href = 'login.html';
     }
 }
 

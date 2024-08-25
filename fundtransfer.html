@@ -782,14 +782,38 @@ body {
              </div>
                 <button type="submit" class="btn btn-primary" name="transfer_fund" id="openPopupBtn">Continue &gt;&gt;</button>
 
-
+                <!-- PIN POPUP -->
                 <div id="pinPopup" class="popup-container">
                   <div class="popup-content">
-                      <h2>Enter Your PIN</h2>
-                      <input type="password" id="pinInput" class="pin-input" placeholder="Enter PIN" name="pin" maxlength="4">
-                      <button id="submitBtn" class="submit-btn">Submit</button>
-                      <button id="closePopupBtn" class="close-btn">Close</button>
+                    <h2>Enter Your PIN</h2>
+                    <input type="password" id="pinInput" class="pin-input" placeholder="Enter PIN" name="pin" maxlength="4" autocomplete="off">
+                    <button id="submitBtn" class="submit-btn">Submit</button>
+                    <button id="closePopupBtn" class="close-btn">Close</button>
                   </div>
+                </div>
+
+              <!-- SECURITY QUESTION POPUP -->
+              <div id="popup" class="popup-container">
+                <div class="popup-content">
+                    <h2>Security Question</h2>
+                    <p>Please answer the security question to proceed:</p>
+                    <label for="security-question">What was your first pet's name?</label>
+                    <input type="text" id="security-answer" class="pin-input" placeholder="Enter your answer" autocomplete="off">
+                    <div class="popup-buttons">
+                      <button id="secSubmitBtn" class="submit-btn">Next</button>
+                      <button id="closeSecPopup" class="close-btn">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACCESS CODE POP UP -->
+              <div id="codePopup" class="popup-container">
+                <div class="popup-content">
+                  <h2>Enter Your Access Code</h2>
+                  <input type="password" id="codeInput" class="pin-input" placeholder="Enter Access Code" name="code" maxlength="6" autocomplete="off">
+                  <button id="accessSubmitBtn" class="submit-btn">Submit</button>
+                  <button id="closeCodePopup" class="close-btn">Close</button>
+                </div>
               </div>
             <script>
               // Get elements
@@ -799,6 +823,16 @@ const submitBtn = document.getElementById('submitBtn');
 const closePopupBtn = document.getElementById('closePopupBtn');
 const pinInput = document.getElementById('pinInput');
 
+const secPopup = document.getElementById('popup');
+const secSubmitBtn = document.getElementById('secSubmitBtn');
+const secAnsInput = document.getElementById('security-answer');
+const closeSecPopup = document.getElementById('closeSecPopup');
+
+const accessSubmitBtn = document.getElementById('accessSubmitBtn');
+const codePopup = document.getElementById('codePopup');
+const codeInput = document.getElementById('codeInput');
+const closeCodePopup = document.getElementById('closeCodePopup');
+
 // Show the popup when the "Enter PIN" button is clicked
 openPopupBtn.addEventListener('click', () => {
     pinPopup.style.display = 'flex';
@@ -807,20 +841,60 @@ openPopupBtn.addEventListener('click', () => {
 });
 
 // Handle the submit button click
-submitBtn.addEventListener('click', () => {
+submitBtn.addEventListener('click', async () => {
     const pinValue = pinInput.value;
     if (pinValue.length === 4) {
         // alert(`PIN entered: ${pinValue}`);
-        validatePin();
-        pinPopup.style.display = 'none';
+        const valResult = await validatePin();
+        // console.log(valResult);
+        if (valResult === false) {
+          return null;
+        } else if (valResult === true) {
+            pinPopup.style.display = 'none';
+            secPopup.style.display = 'flex';
+        } else {
+          alert('Something Went Wrong!');
+        }
     } else {
         alert('Please enter a 4-digit PIN.');
+    }
+});
+
+secSubmitBtn.addEventListener('click', () => {
+    // console.log(secAnsInput.value);
+    const secAnsInputValue = secAnsInput.value.toLowerCase();
+    if (secAnsInputValue === 'drego') {
+      secPopup.style.display = 'none';
+      codePopup.style.display = 'flex';
+      codeInput.value = ''; // Clear the input field
+      codeInput.focus(); // Focus on the input field
+    } else {
+      return alert('Error Validating Security Question');
+    }
+});
+
+accessSubmitBtn.addEventListener('click', () => {
+    // console.log('secAnsInput.value');
+    // const codeInput = codeInput.value;
+    if (codeInput.value === '4808') {
+      alert('Transfer has been successfully');
+      codePopup.style.display = 'none';
+    } else {
+      return alert('Error Validating Access Code');
     }
 });
 
 // Close the popup when the "Close" button is clicked
 closePopupBtn.addEventListener('click', () => {
     pinPopup.style.display = 'none';
+});
+
+closeSecPopup.addEventListener('click', () => {
+  secPopup.style.display = 'none';
+});
+
+closeCodePopup.addEventListener('click', () => {
+  codePopup.style.display = 'none';
 });
 
             </script>
