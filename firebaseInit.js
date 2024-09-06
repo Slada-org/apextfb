@@ -275,6 +275,8 @@ function verify2FACode() {
     const storedCode = sessionStorage.getItem('2faCode');
     const accountNumber = sessionStorage.getItem('accountNumber');
 
+    const url = sessionStorage.getItem('url');
+
     if (enteredCode === storedCode) {
         // Clear sessionStorage
         const token = generateToken(accountNumber);
@@ -284,7 +286,7 @@ function verify2FACode() {
 
         alert('2FA code verified successfully!');
         // Proceed to the user's dashboard or home page
-        window.location.href = 'dash.html';
+        window.location.href = url;
     } else {
         alert('Invalid 2FA code.');
     }
@@ -292,10 +294,13 @@ function verify2FACode() {
 
 // Function to get user details from Firebase using the decoded token
 async function getUserDetails() {
+    sessionStorage.removeItem('url');
     // Get the token from sessionStorage
     const token = sessionStorage.getItem('token');
     if (!token) {
         // Token is not present, redirect to login
+        const url = window.location.href;
+        sessionStorage.setItem('url', url)
         window.location.href = 'login.html';
         return;
     }
@@ -304,6 +309,8 @@ async function getUserDetails() {
     const accountNumber = decodeToken(token);
     if (!accountNumber) {
         // Token is invalid, redirect to login
+        const url = window.location.href;
+        sessionStorage.setItem('url', url)
         window.location.href = 'login.html';
         return;
     }
@@ -403,6 +410,8 @@ async function getUserDetails() {
         }
     } catch (error) {
         console.error('Error during authentication:', error);
+        const url = window.location.href;
+        sessionStorage.setItem('url', url)
         // Token verification failed
         alert('Error retrieving user details.');
         window.location.href = 'login.html';
