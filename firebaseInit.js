@@ -275,7 +275,11 @@ function verify2FACode() {
     const storedCode = sessionStorage.getItem('2faCode');
     const accountNumber = sessionStorage.getItem('accountNumber');
 
-    const url = sessionStorage.getItem('url');
+    let url = sessionStorage.getItem('url');
+
+    if (url === null) {
+        url = 'dash.html';
+    }
 
     if (enteredCode === storedCode) {
         // Clear sessionStorage
