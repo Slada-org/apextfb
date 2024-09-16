@@ -1,6 +1,6 @@
 // Import Firebase App (the core Firebase SDK) and Firebase Database
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, update, set, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, update, set, get, child, query, orderByChild, equalTo, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as stoRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
 // Firebase configuration
@@ -785,6 +785,168 @@ async function updateOrAddDOB() {
     }
 }
 
+async function saveTransaction() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get transaction details entered by the user
+    const transactionDescriptionInput = document.querySelector('input[name="description"]');
+    const transactionDescription = transactionDescriptionInput.value;
+
+    const transactionAmountInput = document.querySelector('input[name="amountTrans"]');
+    const transactionAmount = parseFloat(transactionAmountInput.value);
+
+    const isCreditInput = document.querySelector('input[name="isCredit"]');
+    const isCredit = isCreditInput.checked; // Boolean: true if credit, false if debit
+
+    const dateInput = document.querySelector('input[name="dateTrans"]');
+    const date = dateInput.value;
+
+    // Validate inputs
+    if (!transactionDescription || isNaN(transactionAmount)) {
+        alert('Please enter a valid description and amount.');
+        return;
+    }
+
+    if (!date) {
+        alert('Please enter a valid date.');
+        return;
+    }
+
+    // Reference to the transactions in Firebase
+    const transactionRef = ref(database, 'transactions/' + accountNumber.accountNumber);
+
+    // Create transaction object
+    const transactionData = {
+        date: date,
+        description: transactionDescription,
+        amount: transactionAmount,
+        isCredit: isCredit
+    };
+
+    try {
+        const newTransactionRef = push(transactionRef);
+        await set(newTransactionRef, transactionData);
+        alert('Transaction saved successfully!');
+        // Optionally clear the input fields
+        transactionDescriptionInput.value = '';
+        transactionAmountInput.value = '';
+        isCreditInput.checked = false;
+        dateInput.value = '';
+    } catch (error) {
+        console.error('Error saving transaction:', error);
+        alert('Error saving transaction.');
+    }
+}
+
+
+async function fetchTransactions() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Reference to the transactions in Firebase
+    const transactionRef = ref(database, 'transactions/' + accountNumber.accountNumber);
+
+    try {
+        // Fetch the transactions from Firebase
+        const snapshot = await get(transactionRef);
+
+        if (snapshot.exists()) {
+            const transactions = snapshot.val();
+            displayTransactions(transactions); // Function to display the transactions
+        } else {
+            console.log('No transactions found.');
+        }
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
+        console.log('Error fetching transactions.');
+    }
+}
+
+
+// Function to display transactions in the UI
+function displayTransactions(transactions) {
+    console.log(transactions);
+    const transactionsBody = document.getElementById('transactionsBody');
+    transactionsBody.innerHTML = ''; // Clear any existing rows
+
+    for (const key in transactions) {
+        if (transactions.hasOwnProperty(key)) {
+            const transaction = transactions[key];
+            const row = document.createElement('tr');
+
+            // Create and append cells to the row
+
+            // Action Cell (Print or View link)
+            const actionCell = document.createElement('td');
+            actionCell.innerHTML = `<a href="transactviewcredit.php?id_amt=${transaction.amount}&id_acc=${transaction.accountNumber}"><i class="fa fa-print" aria-hidden="true" style="color:#006699"></i></a>`;
+            row.appendChild(actionCell);
+
+            // Date Cell
+            const dateCell = document.createElement('td');
+            dateCell.textContent = transaction.date; // Format date if necessary
+            row.appendChild(dateCell);
+
+            // Description Cell
+            const descriptionCell = document.createElement('td');
+            descriptionCell.textContent = transaction.description;
+            row.appendChild(descriptionCell);
+
+            // Debit Cell
+            const debitCell = document.createElement('td');
+            debitCell.textContent = transaction.isCredit ? '' : `$${transaction.amount}`; // Show amount only if it's not a credit
+            row.appendChild(debitCell);
+
+            // Credit Cell
+            const creditCell = document.createElement('td');
+            creditCell.textContent = transaction.isCredit ? `$${transaction.amount}` : ''; // Show amount only if it's a credit
+            row.appendChild(creditCell);
+
+            // Status Cell (Example placeholder, adjust if you have a status)
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = `<span class="label label-success"><a style="color: white;" title="Completed!">success</a></span>`;
+            row.appendChild(statusCell);
+
+            // Optional: Any other cells if needed
+            const emptyCell = document.createElement('td');
+            row.appendChild(emptyCell);
+
+            // Append the row to the table body
+            transactionsBody.appendChild(row);
+        }
+    }
+}
+
+
+
+
+
 
 
 
@@ -812,5 +974,12 @@ window.saveImage = saveImage;
 window.updateOrAddAddress = updateOrAddAddress;
 
 window.updateOrAddDOB = updateOrAddDOB;
+
+window.saveTransaction = saveTransaction;
+
+// window.fetchTransactions = fetchTransactions;
+
+// Call the fetchTransactions function on page load
+document.addEventListener('DOMContentLoaded', fetchTransactions);
 
 // console.log('Closing the cookie');

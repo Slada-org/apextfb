@@ -44,6 +44,14 @@
     getUserDetails(); // Execute the function
 </script>
 
+<!-- <script>const name = ()=> {console.log('Wprking')}</script> -->
+
+<script>
+  function nameEmma() {
+    console.log('Emma')
+  };
+</script>
+
   <!-- Google Font -->
   <link rel="stylesheet" href="css/css.css">
 
@@ -680,6 +688,48 @@ body {
 
           </div>
         </div>
+
+        <div class="col-md-6"> 
+          <div class="box box-info">
+              <div class="box-header with-border">
+                  <h3 class="box-title">SAVE TRANSACTION FORM</h3>
+              </div>
+              <form>
+                  <div class="box-body">
+                      <!-- Transaction Description -->
+                      <div class="form-group">
+                          <label for="transactionDescription">Transaction Description</label>
+                          <input type="text" class="form-control" name="description" id="transactionDescription" placeholder="Enter transaction description..." required>
+                      </div>
+      
+                      <!-- Transaction Amount -->
+                      <div class="form-group">
+                          <label for="transactionAmount">Amount</label>
+                          <input type="number" class="form-control" name="amountTrans" id="transactionAmount" placeholder="Enter transaction amount..." required>
+                      </div>
+      
+                      <!-- Transaction Date -->
+                      <div class="form-group">
+                          <label for="transactionDate">Transaction Date</label>
+                          <input type="date" class="form-control" name="dateTrans" id="transactionDate" required>
+                      </div>
+      
+                      <!-- Credit or Debit -->
+                      <div class="form-group">
+                          <label for="isCredit">Credit</label>
+                          <input type="checkbox" name="isCredit" id="isCredit">
+                      </div>
+      
+                      <!-- Submit Button -->
+                      <button onclick="event.preventDefault(); saveTransaction();">Save Transaction</button>
+                
+                  </div>
+              </form>
+            
+              <!-- /.box-body -->
+          </div>
+      </div>
+      
 
         <div class="col-md-6"> 
 
