@@ -980,6 +980,8 @@ window.saveTransaction = saveTransaction;
 // window.fetchTransactions = fetchTransactions;
 
 // Call the fetchTransactions function on page load
-document.addEventListener('DOMContentLoaded', fetchTransactions);
+if (document.location.href === '/login') {
+    document.addEventListener('DOMContentLoaded', fetchTransactions);
+};
 
 // console.log('Closing the cookie');
