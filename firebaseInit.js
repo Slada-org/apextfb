@@ -981,7 +981,7 @@ window.saveTransaction = saveTransaction;
 // window.fetchTransactions = fetchTransactions;
 
 // Call the fetchTransactions function on page load
-if (document.location.href !== '/login') {
+if (document.location.pathname !== '/login') {
     document.addEventListener('DOMContentLoaded', fetchTransactions);
 };
 
