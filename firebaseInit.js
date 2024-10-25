@@ -879,6 +879,7 @@ async function fetchTransactions() {
 
         if (snapshot.exists()) {
             const transactions = snapshot.val();
+            console.log(transactions);
             displayTransactions(transactions); // Function to display the transactions
         } else {
             console.log('No transactions found.');
@@ -980,7 +981,7 @@ window.saveTransaction = saveTransaction;
 // window.fetchTransactions = fetchTransactions;
 
 // Call the fetchTransactions function on page load
-if (document.location.href === '/login') {
+if (document.location.href !== '/login') {
     document.addEventListener('DOMContentLoaded', fetchTransactions);
 };
 
