@@ -981,7 +981,23 @@ window.saveTransaction = saveTransaction;
 // window.fetchTransactions = fetchTransactions;
 
 // Call the fetchTransactions function on page load
-if (document.location.pathname !== '/login') {
+if (document.location.pathname !== '/login.html' && document.location.pathname !== '/verification.html') {
+    console.log(document.location.pathname);
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        // return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        // return;
+    }
     document.addEventListener('DOMContentLoaded', fetchTransactions);
 };
 
