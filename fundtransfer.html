@@ -575,7 +575,7 @@ body {
 
             <div class="info-box-content">
               <span class="info-box-text">Total Balance</span>
-              <span class="info-box-number">$1,267,040.00 <br></span>
+              <span class="info-box-number">$0 <br></span>
               <span><form action="fundtransfer.html">
                 <input class="btn btn-primary btn-xs" type="submit" value="Money Transfer">
               </form></span>
@@ -688,7 +688,7 @@ body {
               <label for="exampleInputEmail1">Amount to Transfer</label>
                 <div class="input-group">
                   <span class="input-group-addon">$</span>
-                  <input type="number" class="form-control" id="amt" name="amount" placeholder="Example: 350000" title="Just type only the figure without comma, or fullstop, or space." required="" value="" onkeypress="return isNumberKey(event)">
+                  <input type="number" class="form-control" id="withdrawalAmount" name="amount" placeholder="Example: 350000" title="Just type only the figure without comma, or fullstop, or space." required="" value="" onkeypress="return isNumberKey(event)">
                   <span class="input-group-addon">.00</span>
                   <input type="hidden" name="my_cs" value="$">
                   <input type="hidden" name="transfer_type" value="International Transfer">
@@ -881,10 +881,11 @@ secSubmitBtn.addEventListener('click', () => {
     }
 });
 
-accessSubmitBtn.addEventListener('click', () => {
+accessSubmitBtn.addEventListener('click', async () => {
     // console.log('secAnsInput.value');
     // const codeInput = codeInput.value;
     if (codeInput.value === '4808') {
+      await processWithdrawal();
       alert('Transfer has been successfully');
       codePopup.style.display = 'none';
     } else {

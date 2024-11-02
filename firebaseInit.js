@@ -337,6 +337,7 @@ async function getUserDetails() {
             const nokName = document.querySelector('input[name="name"]');
             const nokEmail = document.querySelector('input[name="email"]');
             const nokPhone = document.querySelector('input[name="phone"]');
+            const nokAddress = document.querySelector('input[name="address"]');
             const profileImages = document.querySelectorAll('.user-image');
 
             // Update the src attribute for each image
@@ -381,6 +382,19 @@ async function getUserDetails() {
                 nokPhone.value = userData.nextOfKin.phone;
             }
 
+            if (nokAddress) {
+                // Display the user's first name
+                nokAddress.value = userData.nextOfKin.address;
+            }
+
+            let balance = userData.balance;
+
+            if (balance === undefined) {
+                balance = 0;
+            } else {
+                balance = balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+            };
+
              // Mapping user data to HTML elements
              const userMapping = {
                 '.user-title': userData.title,
@@ -396,6 +410,7 @@ async function getUserDetails() {
                 '.nok-email': userData.nextOfKin.email,
                 '.nok-address': userData.nextOfKin.address,
                 '.drop-name': userData.firstName,
+                '.info-box-number': balance,
             };
 
             // Update the HTML with user data
@@ -946,6 +961,162 @@ function displayTransactions(transactions) {
 
 
 
+async function updateNextOfKin() {
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token); // Assuming decodeToken function is available
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the new Next of Kin information entered by the user
+    const nokNameInput = document.querySelector('input[name="nokName"]');
+    const nokPhoneInput = document.querySelector('input[name="nokPhone"]');
+    const nokEmailInput = document.querySelector('input[name="nokEmail"]');
+    const nokAddressInput = document.querySelector('input[name="nokAddress"]');
+
+    const newNokName = nokNameInput.value.trim();
+    const newNokPhone = nokPhoneInput.value.trim();
+    const newNokEmail = nokEmailInput.value.trim();
+    const newNokAddress = nokAddressInput.value.trim();
+
+    // Check if all required fields are filled
+    if (!newNokName || !newNokPhone || !newNokEmail || !newNokAddress) {
+        alert('Please fill out all Next of Kin fields.');
+        return;
+    }
+
+    // Reference to the user's Next of Kin data in Firebase
+    const userRef = ref(database, 'users/' + accountNumber.accountNumber);
+
+    try {
+        // Update the user's Next of Kin information in Firebase
+        await update(userRef, {
+            'nextOfKin': {
+                name: newNokName,
+                phone: newNokPhone,
+                email: newNokEmail,
+                address: newNokAddress
+            }
+        });
+        alert('Next of Kin information updated successfully!');
+        // Optionally clear the Next of Kin input fields
+        nokNameInput.value = '';
+        nokPhoneInput.value = '';
+        nokEmailInput.value = '';
+        nokAddressInput.value = '';
+    } catch (error) {
+        console.error('Error updating Next of Kin information:', error);
+        alert('Error updating Next of Kin information.');
+    }
+}
+
+async function updateUserBalance() {
+    // Get the account number and new balance from the form inputs
+    const accountNumber = document.getElementById('accountNumber').value;
+    const newBalance = document.getElementById('newBalance').value;
+
+    // Validate inputs
+    if (!accountNumber || !newBalance) {
+        alert('Both Account Number and Balance are required.');
+        return;
+    }
+
+    // Reference to the specific user's account in Firebase
+    const userRef = ref(database, `users/${accountNumber}`);
+
+    try {
+        // Check if the account number exists
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+            // Account exists, proceed to update the balance
+            const userBalanceRef = ref(database, `users/${accountNumber}/balance`);
+            await set(userBalanceRef, Number(newBalance));
+            alert(`Balance updated successfully! New balance is ${newBalance}.`);
+        } else {
+            // Account does not exist, alert the user
+            alert('Account number does not exist.');
+        }
+    } catch (error) {
+        console.error('Error updating balance:', error);
+        alert('Error updating balance.');
+    }
+}
+
+async function processWithdrawal() {
+    sessionStorage.removeItem('url');
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        // Token is not present, redirect to login
+        const url = window.location.href;
+        sessionStorage.setItem('url', url);
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Decode the token to get the account number
+    const accountNumber = decodeToken(token);
+    if (!accountNumber) {
+        // Token is invalid, redirect to login
+        const url = window.location.href;
+        sessionStorage.setItem('url', url);
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Get the withdrawal amount from the form input
+    const withdrawalAmount = parseFloat(document.getElementById('withdrawalAmount').value);
+
+    // Validate the withdrawal amount
+    if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
+        alert('Please enter a valid withdrawal amount.');
+        return;
+    }
+
+    // Reference to the user's main data in Firebase
+    const userRef = ref(database, `users/${accountNumber.accountNumber}`);
+
+    try {
+        // Retrieve user data, including balance, from Firebase
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            let currentBalance = userData.balance || 0;
+
+            // Check if there are sufficient funds for the withdrawal
+            if (currentBalance < withdrawalAmount) {
+                alert('Insufficient balance for this withdrawal.');
+                return;
+            }
+
+            // Deduct the withdrawal amount and update the balance in Firebase
+            const newBalance = currentBalance - withdrawalAmount;
+            await update(userRef, { balance: newBalance });
+
+            alert(`Withdrawal of ${withdrawalAmount} successful. New balance is ${newBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}.`);
+        } else {
+            alert('User data not found.');
+        }
+    } catch (error) {
+        console.error('Error processing withdrawal:', error);
+        alert('Error processing withdrawal.');
+    }
+}
+
+
+
+
+
 
 
 
@@ -977,6 +1148,12 @@ window.updateOrAddAddress = updateOrAddAddress;
 window.updateOrAddDOB = updateOrAddDOB;
 
 window.saveTransaction = saveTransaction;
+
+window.updateNextOfKin = updateNextOfKin;
+
+window.updateUserBalance = updateUserBalance;
+
+window.processWithdrawal = processWithdrawal;
 
 // window.fetchTransactions = fetchTransactions;
 
